@@ -37,7 +37,7 @@ import {
 } from "../ui/select";
 
 interface Props {
-  formSubmitHandler: (data: PostType) => void;
+  formSubmitHandler: (data: PostType, reset: () => void) => void;
   isEditForm?: boolean;
 }
 
@@ -66,10 +66,7 @@ const PostInputform = ({ formSubmitHandler, isEditForm = false }: Props) => {
       <CardContent>
         <form
           id="form-rhf-demo"
-          onSubmit={() => {
-            handleSubmit(formSubmitHandler);
-            reset();
-          }}
+          onSubmit={handleSubmit((data) => formSubmitHandler(data, reset))}
         >
           <FieldGroup>
             <Controller

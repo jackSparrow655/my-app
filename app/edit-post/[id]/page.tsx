@@ -3,8 +3,9 @@ import PostInputform from "@/components/form/PostInputForm";
 import { PostType } from "@/app/types";
 
 const CreatePostPage = () => {
-  const EditPostSubmitHandler = (data: PostType) => {
+  const EditPostSubmitHandler = (data: PostType, reset: () => void) => {
     console.log("data = ", data);
+    reset();
   };
   return (
     <div className="container min-h-screen flex justify-center">

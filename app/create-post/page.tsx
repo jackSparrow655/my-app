@@ -4,8 +4,9 @@ import PostInputform from "@/components/form/PostInputForm";
 import { PostType } from "../types";
 
 const CreatePostPage = () => {
-  const createPostFormSubmitHandler = (data: PostType) => {
+  const createPostFormSubmitHandler = (data: PostType, reset:()=>void) => {
     console.log("data = ", data);
+    reset()
   };
 
   return (
