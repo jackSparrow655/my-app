@@ -16,7 +16,7 @@ const PostDetailsPage = () => {
     tag: "react",
   };
   return (
-    <div className="container pt-5 lg:pt-10 min-h-screen">
+    <div className="container pt-5 lg:pt-10 flex-1">
       <Card className="bg-slate-800 text-gray-300">
         <CardHeader className="flex gap-10">
           <p className="text-gray-200 max-w-[70%]">{postDetails.title}</p>
