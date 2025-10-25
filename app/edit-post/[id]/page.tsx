@@ -8,7 +8,7 @@ const CreatePostPage = () => {
     reset();
   };
   return (
-    <div className="container min-h-screen flex justify-center">
+    <div className="container flex-1 flex justify-center">
       <PostInputform
         formSubmitHandler={EditPostSubmitHandler}
         isEditForm={true}
