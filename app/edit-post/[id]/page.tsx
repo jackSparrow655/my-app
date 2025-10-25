@@ -6,7 +6,6 @@ const CreatePostPage = () => {
   const EditPostSubmitHandler = (data: PostType) => {
     console.log("data = ", data);
   };
-
   return (
     <div className="container min-h-screen flex justify-center">
       <PostInputform
