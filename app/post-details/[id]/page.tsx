@@ -26,6 +26,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { use, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export interface editPostDataType {
   title: string;
@@ -50,7 +51,7 @@ const PostDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
     });
   };
 
-  const { data } = useQuery({
+  const { data, isLoading:postFetchinLoading } = useQuery({
     queryKey: ["get-post", `${postId}`],
     queryFn: async () => {
       const response = await axios.get(`/api/posts/get/${postId}`);
@@ -93,6 +94,7 @@ const PostDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
   });
   return (
     <div className="container pt-5 lg:pt-10 flex-1">
+      {postFetchinLoading && <Skeleton className="min-h-44 w-full bg-gray-800"/>}
       {data?.post && (
         <>
           <Card className="bg-slate-800 text-gray-300">
