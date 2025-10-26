@@ -19,7 +19,7 @@ const PostCard = ({ cardData }: { cardData: PostType }) => {
         <p>{cardData.description.slice(12)}</p>
       </CardContent>
       <CardFooter className="flex justify-end mt-2">
-        <Link href="/post-details/1">
+        <Link href={`/post-details/${cardData.id}`}>
           <Button className="cursor-pointer">See more</Button>
         </Link>
       </CardFooter>

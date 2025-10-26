@@ -26,7 +26,6 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group";
 import { formSchema } from "./schema";
-import { PostType } from "@/app/types";
 import {
   Select,
   SelectContent,
@@ -34,15 +33,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { Plus } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { useState } from "react";
+import { editPostDataType } from "@/app/post-details/[id]/page";
 
 interface Props {
-  formSubmitHandler: (data: PostType, reset: () => void) => void;
+  formSubmitHandler: (data: editPostDataType, reset: () => void) => void;
   isEditForm?: boolean;
+  postDetails?: any;
+  loading: boolean;
 }
 
-const PostInputform = ({ formSubmitHandler, isEditForm = false }: Props) => {
+const PostInputform = ({
+  formSubmitHandler,
+  isEditForm = false,
+  postDetails,
+  loading,
+}: Props) => {
+  const [tagModalOpen, setTagModalOpen] = useState<boolean>(false);
+  const queryClient = useQueryClient();
   const {
     handleSubmit,
     control,
@@ -51,11 +70,40 @@ const PostInputform = ({ formSubmitHandler, isEditForm = false }: Props) => {
   } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      tagId: "",
+      title: postDetails ? postDetails.title : "",
+      description: postDetails ? postDetails.description : "",
+      tagId: postDetails ? postDetails.tagId : "",
     },
   });
+
+  const { mutate, isPending: tagAddApiPending } = useMutation({
+    mutationFn: async (data: { name: string }) => {
+      const response = axios.post("/api/tags/create", data);
+      return response;
+    },
+  });
+
+  const {
+    register: tagInputRegister,
+    handleSubmit: tagInputFormHandleSubmit,
+    reset: tagInputFormReset,
+  } = useForm({
+    defaultValues: {
+      tagNameInput: "",
+    },
+  });
+  const tagAddSubmitHandler = (data: any) => {
+    const payload = {
+      name: data.tagNameInput,
+    };
+    mutate(payload, {
+      onSuccess: () => {
+        tagInputFormReset();
+        queryClient.invalidateQueries({ queryKey: ["tags"] });
+        setTagModalOpen(false);
+      },
+    });
+  };
 
   const { data: allTags } = useQuery({
     queryKey: ["tags"],
@@ -64,13 +112,10 @@ const PostInputform = ({ formSubmitHandler, isEditForm = false }: Props) => {
       return data.data;
     },
   });
-  console.log("tagData = ", allTags);
 
   return (
     <Card className="w-full sm:max-w-md bg-slate-900 text-gray-300 border-none h-fit">
-      <CardHeader>
-        <CardTitle>Add Post</CardTitle>
-      </CardHeader>
+      <CardHeader>{!isEditForm && <CardTitle>Add Post</CardTitle>}</CardHeader>
       <CardContent>
         <form
           id="form-rhf-demo"
@@ -140,9 +185,44 @@ const PostInputform = ({ formSubmitHandler, isEditForm = false }: Props) => {
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel
                     htmlFor="form-rhf-complex-billingPeriod"
-                    className="text-gray-300"
+                    className="text-gray-300 flex justify-between "
                   >
                     Select Tag:
+                    <Dialog open={tagModalOpen} onOpenChange={setTagModalOpen}>
+                      <DialogTrigger asChild>
+                        <Button className="flex items-center text-pink-600 cursor-pointer hover:underline">
+                          Add tag <Plus className="w-3" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-md py-4">
+                        <form
+                          id="tag-add-form"
+                          className="flex flex-col gap-3"
+                          onSubmit={(e) => {
+                            e.stopPropagation();
+                            tagInputFormHandleSubmit(tagAddSubmitHandler)(e);
+                          }}
+                        >
+                          <DialogHeader>
+                            <DialogTitle>Enter tag name:</DialogTitle>
+                          </DialogHeader>
+                          <div className="flex items-center gap-2">
+                            <div className="grid flex-1 gap-2">
+                              <Input {...tagInputRegister("tagNameInput")} />
+                            </div>
+                          </div>
+                          <DialogFooter className="">
+                            <Button
+                              type="submit"
+                              form="tag-add-form"
+                              className="bg-pink-600 text-gray-900 hover:bg-pink-700 cursor-pointer"
+                            >
+                              {tagAddApiPending ? "Adding..." : "Add"}
+                            </Button>
+                          </DialogFooter>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
                   </FieldLabel>
                   <Select
                     name={field.name}
@@ -177,7 +257,7 @@ const PostInputform = ({ formSubmitHandler, isEditForm = false }: Props) => {
         <Field orientation="horizontal" className="flex justify-end">
           <Button
             type="button"
-            className="py-5 bg-inherit border text-gray-300 hover:bg-slate-800 border-slate-500"
+            className="py-5 bg-inherit border text-gray-300 hover:bg-slate-800 border-slate-500 cursor-pointer"
             onClick={() => reset()}
           >
             Reset
@@ -188,10 +268,10 @@ const PostInputform = ({ formSubmitHandler, isEditForm = false }: Props) => {
             form="form-rhf-demo"
             className="py-5 bg-pink-700 text-black hover:bg-pink-800 cursor-pointer"
           >
-            {isSubmitting
+            {loading
               ? isEditForm
-                ? "Submitting..."
-                : "Editting..."
+                ? "Editing..."
+                : "Submitting..."
               : isEditForm
               ? "Edit"
               : "Submit"}
