@@ -13,7 +13,7 @@ model Post {
   title       String @db.VarChar(32)
   description String @db.VarChar(100)
   tagId       String
-  tag         Tag    @relation(fields: [tagId], references: [id])
+  tag         Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 }
 
 model Tag {
