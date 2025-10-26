@@ -97,7 +97,7 @@ const PostDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
       {postFetchinLoading && <Skeleton className="min-h-44 w-full bg-gray-800"/>}
       {data?.post && (
         <>
-          <Card className="bg-slate-800 text-gray-300">
+          <Card className="bg-slate-800 text-gray-300 border-none">
             <CardHeader className="flex gap-10">
               <p className="text-gray-200 max-w-[70%]">{data?.post?.title}</p>
               <Badge className="text-black bg-yellow-500">
