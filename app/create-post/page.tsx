@@ -1,17 +1,37 @@
 "use client";
 
 import PostInputform from "@/components/form/PostInputForm";
-import { PostType } from "../types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { editPostDataType } from "../post-details/[id]/page";
 
 const CreatePostPage = () => {
-  const createPostFormSubmitHandler = (data: PostType, reset:()=>void) => {
-    console.log("data = ", data);
-    reset()
+  const queryClient = useQueryClient();
+
+  const { mutate, isPending: createPostLoading } = useMutation({
+    mutationFn: (postData: editPostDataType) => {
+      return axios.post("/api/posts/create", postData);
+    },
+  });
+
+  const createPostFormSubmitHandler = (
+    data: editPostDataType,
+    reset: () => void
+  ) => {
+    mutate(data, {
+      onSuccess: () => {
+        reset();
+        queryClient.invalidateQueries({ queryKey: ["allPosts"] });
+      },
+    });
   };
 
   return (
     <div className="container flex-1 flex justify-center">
-      <PostInputform formSubmitHandler={createPostFormSubmitHandler} />
+      <PostInputform
+        formSubmitHandler={createPostFormSubmitHandler}
+        loading={createPostLoading}
+      />
     </div>
   );
 };

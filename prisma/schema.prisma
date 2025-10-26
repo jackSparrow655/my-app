@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id          String @id @default(uuid())
+  title       String @db.VarChar(32)
+  description String @db.VarChar(100)
+  tagId       String
+  tag         Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+}
+
+model Tag {
+  id   String @id @default(uuid())
+  name String
+  post Post[]
+}

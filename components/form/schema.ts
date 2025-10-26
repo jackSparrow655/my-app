@@ -9,5 +9,5 @@ export const formSchema = z.object({
     .string()
     .min(10, "Description must be at least 10 characters.")
     .max(100, "Description must be at most 100 characters."),
-  tag: z.string().nonempty({ message: "Please select a tag." }),
+  tagId: z.string().nonempty({ message: "Please select a tag." }),
 });
