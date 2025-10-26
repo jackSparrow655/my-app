@@ -8,6 +8,7 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PostType } from "@/app/types";
+import { ArrowBigRight } from "lucide-react";
 
 const PostCard = ({ cardData }: { cardData: PostType }) => {
   return (
@@ -20,7 +21,7 @@ const PostCard = ({ cardData }: { cardData: PostType }) => {
       </CardContent>
       <CardFooter className="flex justify-end mt-2">
         <Link href={`/post-details/${cardData.id}`}>
-          <Button className="cursor-pointer">See more</Button>
+          <Button className="cursor-pointer"><ArrowBigRight fill="red" stroke="" strokeWidth={2}  className=""/></Button>
         </Link>
       </CardFooter>
     </Card>
