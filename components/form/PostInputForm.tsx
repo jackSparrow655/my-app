@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/input-group";
 import { formSchema } from "./schema";
 import { PostType } from "@/app/types";
-import { tagItems } from "@/const/data";
 import {
   Select,
   SelectContent,
@@ -35,6 +34,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 interface Props {
   formSubmitHandler: (data: PostType, reset: () => void) => void;
@@ -52,11 +53,18 @@ const PostInputform = ({ formSubmitHandler, isEditForm = false }: Props) => {
     defaultValues: {
       title: "",
       description: "",
-      tag: "",
+      tagId: "",
     },
   });
 
-  console.log("isSumitting = ", isSubmitting);
+  const { data: allTags } = useQuery({
+    queryKey: ["tags"],
+    queryFn: async () => {
+      const { data } = await axios.get("/api/tags/get-all");
+      return data.data;
+    },
+  });
+  console.log("tagData = ", allTags);
 
   return (
     <Card className="w-full sm:max-w-md bg-slate-900 text-gray-300 border-none h-fit">
@@ -126,7 +134,7 @@ const PostInputform = ({ formSubmitHandler, isEditForm = false }: Props) => {
               )}
             />
             <Controller
-              name="tag"
+              name="tagId"
               control={control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
@@ -149,9 +157,9 @@ const PostInputform = ({ formSubmitHandler, isEditForm = false }: Props) => {
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent className="bg-slate-900 text-gray-300">
-                      {tagItems.map((tag, index) => (
-                        <SelectItem className="" key={index} value={tag}>
-                          {tag}
+                      {allTags?.map((tag: any, index: number) => (
+                        <SelectItem className="" key={index} value={tag.id}>
+                          {tag.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
